@@ -1,9 +1,10 @@
 {
     "manifest_version": 2,
     "name": "Meets+",
+    "description": "Additional functionalities to Google Meets",
     "version": "1.0",
-    "icons": {},
     "browser_action": {
-        "default_title": "Meets+"
+        "default_title": "Meets+",
+        "default_popup": "./html/popup.html"
     }
 }
