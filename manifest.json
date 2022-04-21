@@ -6,5 +6,11 @@
     "action": {
         "default_title": "Meets+",
         "default_popup": "./html/popup.html"
-    }
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://meet.google.com/*"],
+            "js": ["./js/content.js"]
+        }
+    ]
 }
