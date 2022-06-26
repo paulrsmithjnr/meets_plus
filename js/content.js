@@ -1,26 +1,53 @@
-console.log("On a Meets Call! - content");
 window.onload = function () {
-    console.log("Fully loaded!");
-    const contentDivClassName = "MCcOAc IqBfM ecJEib EWZcud d8Etdd cjGgHb LcUz9d";
-    const div = document.getElementsByClassName(contentDivClassName);
-    console.log("This is the div:", div[0]);
-
     const btnsDivClassName = "Tmb7Fd";
-    const btnsDiv = document.getElementsByClassName(btnsDivClassName)[0];
+    let btnsDiv = document.getElementsByClassName(btnsDivClassName)[0];
 
-    var pipBtn = document.createElement("div");
-    pipBtn.classList.add("pipBtn");
 
-    // var pipIcon = document.createElement("img");
+    if (btnsDiv === null || btnsDiv === undefined) {
 
-    // const imgSRC = chrome.runtime.getURL("./img/meets_plus_icon.png");
-    // console.log("imgSRC:", imgSRC);
+        //checks all new additions to the page until the div holding the btns are found
+        var observer = new MutationObserver(function(mutations) {
 
-    // pipIcon.src = imgSRC;
-    // pipIcon.alt = "Pip Icon";
-    // pipBtn.appendChild(pipIcon);
+            mutations.every(mutation => {
+                for(var i=0; i<mutation.addedNodes.length; i++) {
 
-    btnsDiv.insertBefore(pipBtn, btnsDiv.children[0]);
+                    //if the node is an html element node...
+                    if(mutation.addedNodes[i].nodeType === 1) {
+                        if(mutation.addedNodes[i].classList.contains(btnsDivClassName)) {
+                            btnsDiv = mutation.addedNodes[i];
+                            
+                            addPipBtn();
 
-    console.log("btnsDiv:", btnsDiv);
+                            observer.disconnect();
+                            return false; //breaks out of "every" callback function
+                        }
+                    }
+                }
+
+                return true //"every" callback function moves to the next iteration
+            });
+
+        });
+        
+        observer.observe(document.documentElement, {
+            childList: true,
+            subtree: true
+        });
+    } else {
+        addPipBtn();
+    }
+
+
+    function addPipBtn() {
+        const pipBtn = document.createElement("div");
+        pipBtn.classList.add("pipBtn");
+
+        const pipIcon = document.createElement("img");
+        const imgSRC = chrome.runtime.getURL("./img/meets_plus_icon.png");
+        pipIcon.src = imgSRC;
+        pipIcon.alt = "Pip Icon";
+        pipBtn.appendChild(pipIcon);
+
+        btnsDiv.insertBefore(pipBtn, btnsDiv.children[0]);
+    }
 }

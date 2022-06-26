@@ -16,7 +16,7 @@
     ],
     "web_accessible_resources": [
         {
-        "resources": ["./img/meets_plus_icon.png"],
+        "resources": ["img/meets_plus_icon.png"],
         "matches": [ "https://meet.google.com/*" ]
        }
     ]
