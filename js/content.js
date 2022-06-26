@@ -39,6 +39,18 @@ window.onload = function () {
 
 
     function addPipBtn() {
+        const container = document.createElement("div");
+        container.id = "container";
+
+        const popupMenu = document.createElement("div");
+        popupMenu.id = "popupMenu";
+        popupMenu.classList.add("hide");
+
+        //TODO: Remove this add and actual functionality
+        popupMenu.innerText = "This is the popup menu";
+
+        container.appendChild(popupMenu);
+
         const pipBtn = document.createElement("div");
         pipBtn.classList.add("pipBtn");
 
@@ -46,8 +58,14 @@ window.onload = function () {
         const imgSRC = chrome.runtime.getURL("./img/meets_plus_icon.png");
         pipIcon.src = imgSRC;
         pipIcon.alt = "Pip Icon";
-        pipBtn.appendChild(pipIcon);
 
-        btnsDiv.insertBefore(pipBtn, btnsDiv.children[0]);
+        pipBtn.onclick = () => {
+            popupMenu.classList.toggle("hide");
+        }
+
+        pipBtn.appendChild(pipIcon);
+        container.appendChild(pipBtn);
+
+        btnsDiv.insertBefore(container, btnsDiv.children[0]);
     }
 }

@@ -1,3 +1,25 @@
+#container {
+    margin-right: 6px;
+    position: relative;
+}
+
+.hide {
+    display: none;
+}
+
+#popupMenu {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 20px);
+
+    padding: 20px;
+    width: 200px;
+    height: fit-content;
+
+    background-color: white;
+    color: black;
+}
+
 .pipBtn {
     height: 40px;
     width: 40px;
