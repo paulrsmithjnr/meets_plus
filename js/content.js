@@ -2,6 +2,23 @@ window.onload = function () {
     const btnsDivClassName = "Tmb7Fd";
     let btnsDiv = document.getElementsByClassName(btnsDivClassName)[0];
 
+    
+    let videosToPiP = [];
+    let pipStarted = false;
+    
+    const pipvideo = document.createElement( "video" );
+    pipvideo.onleavepictureinpicture = () => {
+        pipStarted = false;
+    }
+    pipvideo.onenterpictureinpicture = () => {
+        pipStarted = true;
+    }
+
+    //global constants
+    const VIDEO_PIP_LIMIT = 5;
+    const CANVAS_VIDEO_HEIGHT = 720;
+    const CANVAS_VIDEO_WIDTH = 1280;
+
 
     if (btnsDiv === null || btnsDiv === undefined) {
 
@@ -42,6 +59,25 @@ window.onload = function () {
         const container = document.createElement("div");
         container.id = "container";
 
+        const popupMenu = createPopUpMenu();
+        container.appendChild(popupMenu);
+
+        const pipBtn = createPiPBtn();
+        pipBtn.onclick = () => {
+            if(popupMenu.classList.contains("hide")) {
+                const popupMenuBody = popupMenu.getElementsByClassName("popupMenuBody")[0];
+                getVideos(popupMenuBody);
+            }
+
+            popupMenu.classList.toggle("hide");
+        }
+        container.appendChild(pipBtn);
+
+        btnsDiv.insertBefore(container, btnsDiv.children[0]);
+    }
+
+
+    function createPopUpMenu() {
         const popupMenu = document.createElement("div");
         popupMenu.id = "popupMenu";
         popupMenu.classList.add("hide");
@@ -52,11 +88,24 @@ window.onload = function () {
         popupMenuBody = document.createElement("div");
         popupMenuBody.classList.add("popupMenuBody");
 
+        popupMenuFooter = document.createElement("div");
+        popupMenuFooter.classList.add("popupMenuFooter");
+        
+        const startPipBtn = document.createElement("button");
+        startPipBtn.innerText = "Start PiP";
+        startPipBtn.onclick = startPiP;
+
+        popupMenuFooter.appendChild(startPipBtn);
+
         popupMenu.appendChild(popupMenuHeader);
         popupMenu.appendChild(popupMenuBody);
+        popupMenu.appendChild(popupMenuFooter);
 
-        container.appendChild(popupMenu);
+        return popupMenu;
+    }
 
+
+    function createPiPBtn() {
         const pipBtn = document.createElement("div");
         pipBtn.classList.add("pipBtn");
 
@@ -65,18 +114,9 @@ window.onload = function () {
         pipIcon.src = imgSRC;
         pipIcon.alt = "Pip Icon";
 
-        pipBtn.onclick = () => {
-            if(popupMenu.classList.contains("hide")) {
-                getVideos(popupMenuBody);
-            }
-            
-            popupMenu.classList.toggle("hide");
-        }
-
         pipBtn.appendChild(pipIcon);
-        container.appendChild(pipBtn);
 
-        btnsDiv.insertBefore(container, btnsDiv.children[0]);
+        return pipBtn;
     }
 
 
@@ -99,7 +139,13 @@ window.onload = function () {
                     listItem.innerText = textDiv.innerText;
 
                     listItem.onclick = () => {
-                        video.requestPictureInPicture();
+                        listItem.classList.toggle("selected");
+
+                        if((videosToPiP.indexOf(video) === -1) && videosToPiP.length < VIDEO_PIP_LIMIT){
+                            videosToPiP.push(video);
+                            // console.log("videosToPiP: ", videosToPiP);
+                        }
+                        // video.requestPictureInPicture();
                     }
 
                     popupMenuBody.appendChild(listItem); 
@@ -108,6 +154,35 @@ window.onload = function () {
 
             if(!videosDetected) {
                 popupMenuBody.innerText = "No videos detected.";
+            }
+        }
+
+        // console.log("videosToPiP: ", videosToPiP);
+    }
+
+
+    async function startPiP() {
+        if(pipStarted) {
+            document.exitPictureInPicture()
+            pipvideo.srcObject.getTracks().forEach(track => track.stop());
+        } else {
+            const canvas = document.createElement( "canvas" );
+        
+            canvas.height = CANVAS_VIDEO_HEIGHT * videosToPiP.length;
+            canvas.width = CANVAS_VIDEO_WIDTH;
+            const ctx = canvas.getContext( "2d" );
+            
+            pipvideo.srcObject = canvas.captureStream();
+
+            addVideosToPiPCanvas();
+            await pipvideo.play();
+            pipvideo.requestPictureInPicture();
+
+            function addVideosToPiPCanvas() {
+                for(let i = 0; i < videosToPiP.length; i++) {
+                    ctx.drawImage(videosToPiP[i], 0, CANVAS_VIDEO_HEIGHT * i, CANVAS_VIDEO_WIDTH, CANVAS_VIDEO_HEIGHT);
+                }
+                requestAnimationFrame(addVideosToPiPCanvas);
             }
         }
     }

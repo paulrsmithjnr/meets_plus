@@ -47,7 +47,7 @@
     justify-content: center;
 }
 
-.listItem:hover {
+.listItem:hover, .selected {
     border-left: solid purple 2px;
     background-color: rgba(228, 0, 228, 0.733);
 
