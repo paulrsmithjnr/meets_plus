@@ -46,8 +46,14 @@ window.onload = function () {
         popupMenu.id = "popupMenu";
         popupMenu.classList.add("hide");
 
-        //TODO: Remove this add and actual functionality
-        popupMenu.innerText = "This is the popup menu";
+        popupMenuHeader = document.createElement("div");
+        popupMenuHeader.classList.add("popupMenuHeader");
+
+        popupMenuBody = document.createElement("div");
+        popupMenuBody.classList.add("popupMenuBody");
+
+        popupMenu.appendChild(popupMenuHeader);
+        popupMenu.appendChild(popupMenuBody);
 
         container.appendChild(popupMenu);
 
@@ -60,6 +66,10 @@ window.onload = function () {
         pipIcon.alt = "Pip Icon";
 
         pipBtn.onclick = () => {
+            if(popupMenu.classList.contains("hide")) {
+                getVideos(popupMenuBody);
+            }
+            
             popupMenu.classList.toggle("hide");
         }
 
@@ -67,5 +77,38 @@ window.onload = function () {
         container.appendChild(pipBtn);
 
         btnsDiv.insertBefore(container, btnsDiv.children[0]);
+    }
+
+
+    function getVideos(popupMenuBody) {
+        popupMenuBody.innerHTML = ""; //clears content
+
+        let videosDetected = false;
+
+        const videos = document.getElementsByClassName("Gv1mTb-aTv5jf");
+        if(videos !== null && videos !== undefined) {
+            for(let video of videos) {
+                if(video.srcObject !== null) {
+                    videosDetected = true;
+
+                    const parentDiv = video.parentNode.parentNode.parentNode.parentNode;
+                    const textDiv = parentDiv.getElementsByClassName("XEazBc adnwBd")[0];
+
+                    const listItem = document.createElement("div");
+                    listItem.classList.add("listItem");
+                    listItem.innerText = textDiv.innerText;
+
+                    listItem.onclick = () => {
+                        video.requestPictureInPicture();
+                    }
+
+                    popupMenuBody.appendChild(listItem); 
+                }
+            }
+
+            if(!videosDetected) {
+                popupMenuBody.innerText = "No videos detected.";
+            }
+        }
     }
 }

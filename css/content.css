@@ -16,6 +16,7 @@
     width: 200px;
     height: fit-content;
 
+    z-index: 2;
     background-color: white;
     color: black;
 }
@@ -34,4 +35,22 @@
 
 .pipBtn:hover {
     background-color: #5f636894;
+}
+
+.listItem {
+    height: 30px;
+
+    cursor: pointer;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.listItem:hover {
+    border-left: solid purple 2px;
+    background-color: rgba(228, 0, 228, 0.733);
+
+    font-weight: bold;
+    font-style: italic;
 }
