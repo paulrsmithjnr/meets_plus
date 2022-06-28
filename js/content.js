@@ -1,23 +1,25 @@
 window.onload = function () {
     const btnsDivClassName = "Tmb7Fd";
     let btnsDiv = document.getElementsByClassName(btnsDivClassName)[0];
-
     
     let videosToPiP = [];
     let pipStarted = false;
-    
+
     const pipvideo = document.createElement( "video" );
     pipvideo.onleavepictureinpicture = () => {
         pipStarted = false;
     }
-    pipvideo.onenterpictureinpicture = () => {
+    pipvideo.onenterpictureinpicture = (event) => {
         pipStarted = true;
+
+        // const pipWindow = event.pictureInPictureWindow;
+        // console.log(`The floating window dimensions are: ${pipWindow.width}x${pipWindow.height}px`);
     }
 
     //global constants
-    const VIDEO_PIP_LIMIT = 5;
-    const CANVAS_VIDEO_HEIGHT = 720;
-    const CANVAS_VIDEO_WIDTH = 1280;
+    const VIDEO_PIP_LIMIT = 3;
+    const CANVAS_VIDEO_HEIGHT = 146;
+    const CANVAS_VIDEO_WIDTH = 260;
 
 
     if (btnsDiv === null || btnsDiv === undefined) {
@@ -112,7 +114,7 @@ window.onload = function () {
         const pipIcon = document.createElement("img");
         const imgSRC = chrome.runtime.getURL("./img/meets_plus_icon.png");
         pipIcon.src = imgSRC;
-        pipIcon.alt = "Pip Icon";
+        pipIcon.alt = "PiP Icon";
 
         pipBtn.appendChild(pipIcon);
 
@@ -143,9 +145,7 @@ window.onload = function () {
 
                         if((videosToPiP.indexOf(video) === -1) && videosToPiP.length < VIDEO_PIP_LIMIT){
                             videosToPiP.push(video);
-                            // console.log("videosToPiP: ", videosToPiP);
                         }
-                        // video.requestPictureInPicture();
                     }
 
                     popupMenuBody.appendChild(listItem); 
@@ -156,18 +156,20 @@ window.onload = function () {
                 popupMenuBody.innerText = "No videos detected.";
             }
         }
-
-        // console.log("videosToPiP: ", videosToPiP);
     }
 
 
     async function startPiP() {
+        if(videosToPiP.length === 0) {
+            return;
+        }
+
         if(pipStarted) {
             document.exitPictureInPicture()
             pipvideo.srcObject.getTracks().forEach(track => track.stop());
         } else {
             const canvas = document.createElement( "canvas" );
-        
+            
             canvas.height = CANVAS_VIDEO_HEIGHT * videosToPiP.length;
             canvas.width = CANVAS_VIDEO_WIDTH;
             const ctx = canvas.getContext( "2d" );
