@@ -136,8 +136,9 @@ window.onload = function () {
         let videosDetected = false;
         const videos = document.getElementsByClassName("Gv1mTb-aTv5jf");
         if(videos !== null && videos !== undefined) {
+            noNameCount = 1;
             for(let video of videos) {
-                if(video.srcObject !== null) {
+                if(video.srcObject !== null && video.style.display !== "none") {
                     videosDetected = true;
 
                     const parentDiv = video.parentNode.parentNode.parentNode.parentNode;
@@ -145,7 +146,13 @@ window.onload = function () {
 
                     const listItem = document.createElement("div");
                     listItem.classList.add("listItem");
-                    listItem.innerText = textDiv.innerText;
+
+                    if(textDiv !== undefined) {
+                        listItem.innerText = textDiv.innerText;
+                    } else {
+                        listItem.innerText = `Presentation ${noNameCount}`;
+                        noNameCount++;
+                    }
 
                     listItem.onclick = () => {
                         //adds or removes video
