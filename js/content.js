@@ -35,6 +35,7 @@ window.onload = function () {
                         if(mutation.addedNodes[i].classList.contains(btnsDivClassName)) {
                             btnsDiv = mutation.addedNodes[i];
                             
+                            addFullScreenBtn();
                             addPipBtn();
 
                             observer.disconnect();
@@ -53,25 +54,91 @@ window.onload = function () {
             subtree: true
         });
     } else {
+        addFullScreenBtn();
         addPipBtn();
+    }
+
+
+    function addFullScreenBtn() {
+        const container = document.createElement("div");
+        container.classList.add("container");
+
+        const fullScreenMenu = createFullScreenMenu();
+        container.appendChild(fullScreenMenu);
+
+        const fullScreenBtn = createFullScreenBtn();
+        // fullScreenBtn.onclick = () => {
+        //     if(fullScreenMenu.classList.contains("hide")) {
+        //         const fullScreenMenuBody = fullScreenMenu.getElementsByClassName("fullScreenMenuBody")[0];
+        //         getVideos(fullScreenMenuBody);
+        //     }
+
+        //     fullScreenMenu.classList.toggle("hide");
+        // }
+        container.appendChild(fullScreenBtn);
+
+        btnsDiv.insertBefore(container, btnsDiv.children[0]);
+    }
+
+
+    function createFullScreenMenu() {
+        const fullScreenMenu = document.createElement("div");
+        fullScreenMenu.id = "fullScreenMenu";
+        fullScreenMenu.classList.add("hide");
+
+        fullScreenMenuHeader = document.createElement("div");
+        fullScreenMenuHeader.classList.add("fullScreenMenuHeader");
+
+        fullScreenMenuBody = document.createElement("div");
+        fullScreenMenuBody.classList.add("fullScreenMenuBody");
+
+        fullScreenMenuFooter = document.createElement("div");
+        fullScreenMenuFooter.classList.add("fullScreenMenuFooter");
+        
+        const enterFullScreenBtn = document.createElement("button");
+        enterFullScreenBtn.id = "enterFullScreenBtn";
+        // enterFullScreenBtn.onclick = startPiP;
+
+        fullScreenMenuFooter.appendChild(enterFullScreenBtn);
+
+        fullScreenMenu.appendChild(fullScreenMenuHeader);
+        fullScreenMenu.appendChild(fullScreenMenuBody);
+        fullScreenMenu.appendChild(fullScreenMenuFooter);
+
+        return fullScreenMenu;
+    }
+
+
+    function createFullScreenBtn() {
+        const fullScreenBtn = document.createElement("div");
+        fullScreenBtn.classList.add("fullScreenBtn");
+
+        const fullScreenIcon = document.createElement("img");
+        const imgSRC = chrome.runtime.getURL("./img/full_screen.png");
+        fullScreenIcon.src = imgSRC;
+        fullScreenIcon.alt = "Full Screen Icon";
+
+        fullScreenBtn.appendChild(fullScreenIcon);
+
+        return fullScreenBtn;
     }
 
 
     function addPipBtn() {
         const container = document.createElement("div");
-        container.id = "container";
+        container.classList.add("container");
 
-        const popupMenu = createPopUpMenu();
-        container.appendChild(popupMenu);
+        const pipMenu = createPipMenu();
+        container.appendChild(pipMenu);
 
         const pipBtn = createPiPBtn();
         pipBtn.onclick = () => {
-            if(popupMenu.classList.contains("hide")) {
-                const popupMenuBody = popupMenu.getElementsByClassName("popupMenuBody")[0];
-                getVideos(popupMenuBody);
+            if(pipMenu.classList.contains("hide")) {
+                const pipMenuBody = pipMenu.getElementsByClassName("pipMenuBody")[0];
+                getVideos(pipMenuBody);
             }
 
-            popupMenu.classList.toggle("hide");
+            pipMenu.classList.toggle("hide");
         }
         container.appendChild(pipBtn);
 
@@ -79,31 +146,31 @@ window.onload = function () {
     }
 
 
-    function createPopUpMenu() {
-        const popupMenu = document.createElement("div");
-        popupMenu.id = "popupMenu";
-        popupMenu.classList.add("hide");
+    function createPipMenu() {
+        const pipMenu = document.createElement("div");
+        pipMenu.id = "pipMenu";
+        pipMenu.classList.add("hide");
 
-        popupMenuHeader = document.createElement("div");
-        popupMenuHeader.classList.add("popupMenuHeader");
+        pipMenuHeader = document.createElement("div");
+        pipMenuHeader.classList.add("pipMenuHeader");
 
-        popupMenuBody = document.createElement("div");
-        popupMenuBody.classList.add("popupMenuBody");
+        pipMenuBody = document.createElement("div");
+        pipMenuBody.classList.add("pipMenuBody");
 
-        popupMenuFooter = document.createElement("div");
-        popupMenuFooter.classList.add("popupMenuFooter");
+        pipMenuFooter = document.createElement("div");
+        pipMenuFooter.classList.add("pipMenuFooter");
         
         const startPipBtn = document.createElement("button");
         startPipBtn.id = "startPipBtn";
         startPipBtn.onclick = startPiP;
 
-        popupMenuFooter.appendChild(startPipBtn);
+        pipMenuFooter.appendChild(startPipBtn);
 
-        popupMenu.appendChild(popupMenuHeader);
-        popupMenu.appendChild(popupMenuBody);
-        popupMenu.appendChild(popupMenuFooter);
+        pipMenu.appendChild(pipMenuHeader);
+        pipMenu.appendChild(pipMenuBody);
+        pipMenu.appendChild(pipMenuFooter);
 
-        return popupMenu;
+        return pipMenu;
     }
 
 
@@ -122,8 +189,8 @@ window.onload = function () {
     }
 
 
-    function getVideos(popupMenuBody) {
-        popupMenuBody.innerHTML = ""; //clears content
+    function getVideos(pipMenuBody) {
+        pipMenuBody.innerHTML = ""; //clears content
 
         const startPipBtn = document.getElementById("startPipBtn");
         if(pipStarted) {
@@ -168,20 +235,20 @@ window.onload = function () {
                         }
                     }
 
-                    popupMenuBody.appendChild(listItem); 
+                    pipMenuBody.appendChild(listItem); 
                 }
             }
 
             if(!videosDetected) {
-                popupMenuBody.innerText = "No videos detected.";
+                pipMenuBody.innerText = "No videos detected.";
             }
         }
     }
 
 
     async function startPiP() {
-        const popupMenu = document.getElementById("popupMenu");
-        popupMenu.classList.add("hide");
+        const pipMenu = document.getElementById("pipMenu");
+        pipMenu.classList.add("hide");
 
         if(videosToPiP.length === 0) {
             return;
