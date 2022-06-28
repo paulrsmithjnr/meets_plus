@@ -141,10 +141,16 @@ window.onload = function () {
                     listItem.innerText = textDiv.innerText;
 
                     listItem.onclick = () => {
-                        listItem.classList.toggle("selected");
-
-                        if((videosToPiP.indexOf(video) === -1) && videosToPiP.length < VIDEO_PIP_LIMIT){
-                            videosToPiP.push(video);
+                        //adds or removes video
+                        const index = videosToPiP.indexOf(video);
+                        if(index === -1) {
+                            if(videosToPiP.length < VIDEO_PIP_LIMIT) {
+                                videosToPiP.push(video);
+                                listItem.classList.toggle("selected");
+                            }
+                        } else {
+                            videosToPiP.splice(index, 1);
+                            listItem.classList.toggle("selected");
                         }
                     }
 
