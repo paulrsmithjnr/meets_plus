@@ -94,7 +94,7 @@ window.onload = function () {
         popupMenuFooter.classList.add("popupMenuFooter");
         
         const startPipBtn = document.createElement("button");
-        startPipBtn.innerText = "Start PiP";
+        startPipBtn.id = "startPipBtn";
         startPipBtn.onclick = startPiP;
 
         popupMenuFooter.appendChild(startPipBtn);
@@ -125,8 +125,15 @@ window.onload = function () {
     function getVideos(popupMenuBody) {
         popupMenuBody.innerHTML = ""; //clears content
 
-        let videosDetected = false;
+        const startPipBtn = document.getElementById("startPipBtn");
+        if(pipStarted) {
+            startPipBtn.innerText = "Stop PiP";
+            return;
+        } else {
+            startPipBtn.innerText = "Start PiP";
+        }
 
+        let videosDetected = false;
         const videos = document.getElementsByClassName("Gv1mTb-aTv5jf");
         if(videos !== null && videos !== undefined) {
             for(let video of videos) {
@@ -166,13 +173,17 @@ window.onload = function () {
 
 
     async function startPiP() {
+        const popupMenu = document.getElementById("popupMenu");
+        popupMenu.classList.add("hide");
+
         if(videosToPiP.length === 0) {
             return;
         }
 
         if(pipStarted) {
-            document.exitPictureInPicture()
+            document.exitPictureInPicture();
             pipvideo.srcObject.getTracks().forEach(track => track.stop());
+            videosToPiP = [];
         } else {
             const canvas = document.createElement( "canvas" );
             
