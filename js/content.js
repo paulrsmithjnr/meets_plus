@@ -2,12 +2,13 @@ window.onload = function () {
     const btnsDivClassName = "Tmb7Fd";
     let btnsDiv = document.getElementsByClassName(btnsDivClassName)[0];
     
-    let videosToPiP = [];
+    let videosFound = [];
     let pipStarted = false;
 
     const pipvideo = document.createElement( "video" );
     pipvideo.onleavepictureinpicture = () => {
         pipStarted = false;
+        endPiP();
     }
     pipvideo.onenterpictureinpicture = (event) => {
         pipStarted = true;
@@ -223,14 +224,14 @@ window.onload = function () {
 
                     listItem.onclick = () => {
                         //adds or removes video
-                        const index = videosToPiP.indexOf(video);
+                        const index = videosFound.indexOf(video);
                         if(index === -1) {
-                            if(videosToPiP.length < VIDEO_PIP_LIMIT) {
-                                videosToPiP.push(video);
+                            if(videosFound.length < VIDEO_PIP_LIMIT) {
+                                videosFound.push(video);
                                 listItem.classList.toggle("selected");
                             }
                         } else {
-                            videosToPiP.splice(index, 1);
+                            videosFound.splice(index, 1);
                             listItem.classList.toggle("selected");
                         }
                     }
@@ -250,18 +251,16 @@ window.onload = function () {
         const pipMenu = document.getElementById("pipMenu");
         pipMenu.classList.add("hide");
 
-        if(videosToPiP.length === 0) {
+        if(videosFound.length === 0) {
             return;
         }
 
         if(pipStarted) {
-            document.exitPictureInPicture();
-            pipvideo.srcObject.getTracks().forEach(track => track.stop());
-            videosToPiP = [];
+            endPiP();
         } else {
             const canvas = document.createElement( "canvas" );
             
-            canvas.height = CANVAS_VIDEO_HEIGHT * videosToPiP.length;
+            canvas.height = CANVAS_VIDEO_HEIGHT * videosFound.length;
             canvas.width = CANVAS_VIDEO_WIDTH;
             const ctx = canvas.getContext( "2d" );
             
@@ -272,11 +271,17 @@ window.onload = function () {
             pipvideo.requestPictureInPicture();
 
             function addVideosToPiPCanvas() {
-                for(let i = 0; i < videosToPiP.length; i++) {
-                    ctx.drawImage(videosToPiP[i], 0, CANVAS_VIDEO_HEIGHT * i, CANVAS_VIDEO_WIDTH, CANVAS_VIDEO_HEIGHT);
+                for(let i = 0; i < videosFound.length; i++) {
+                    ctx.drawImage(videosFound[i], 0, CANVAS_VIDEO_HEIGHT * i, CANVAS_VIDEO_WIDTH, CANVAS_VIDEO_HEIGHT);
                 }
                 requestAnimationFrame(addVideosToPiPCanvas);
             }
         }
+    }
+
+    function endPiP() {
+        document.exitPictureInPicture();
+        pipvideo.srcObject.getTracks().forEach(track => track.stop());
+        videosFound = [];
     }
 }
