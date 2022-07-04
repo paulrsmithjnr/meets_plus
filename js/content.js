@@ -6,6 +6,8 @@ window.onload = function () {
     let videosToPiP = [];
     let pipStarted = false;
 
+    let videoToFullScreen;
+
     const pipvideo = document.createElement( "video" );
     pipvideo.onleavepictureinpicture = () => {
         cleanupPiP();
@@ -60,7 +62,7 @@ window.onload = function () {
     }
 
 
-    function getVideos() {
+    function refreshVideos() {
         videosFound = {}; //reset videosFound
         
         const videos = document.getElementsByClassName("Gv1mTb-aTv5jf");
@@ -95,17 +97,31 @@ window.onload = function () {
         container.appendChild(fullScreenMenu);
 
         const fullScreenBtn = createFullScreenBtn();
-        // fullScreenBtn.onclick = () => {
-        //     if(fullScreenMenu.classList.contains("hide")) {
-        //         const fullScreenMenuBody = fullScreenMenu.getElementsByClassName("fullScreenMenuBody")[0];
-        //         getVideos(fullScreenMenuBody);
-        //     }
+        fullScreenBtn.onclick = () => {
+            const fullScreenMenuBody = fullScreenMenu.getElementsByClassName("fullScreenMenuBody")[0];
+            refreshVideos();
+            populateFullScreenMenu(fullScreenMenuBody);
 
-        //     fullScreenMenu.classList.toggle("hide");
-        // }
+            fullScreenMenu.classList.toggle("hide");
+        }
         container.appendChild(fullScreenBtn);
 
         btnsDiv.insertBefore(container, btnsDiv.children[0]);
+    }
+
+
+    function createFullScreenBtn() {
+        const fullScreenBtn = document.createElement("div");
+        fullScreenBtn.classList.add("fullScreenBtn");
+
+        const fullScreenIcon = document.createElement("img");
+        const imgSRC = chrome.runtime.getURL("./img/full_screen.png");
+        fullScreenIcon.src = imgSRC;
+        fullScreenIcon.alt = "Full Screen Icon";
+
+        fullScreenBtn.appendChild(fullScreenIcon);
+
+        return fullScreenBtn;
     }
 
 
@@ -125,7 +141,9 @@ window.onload = function () {
         
         const enterFullScreenBtn = document.createElement("button");
         enterFullScreenBtn.id = "enterFullScreenBtn";
-        // enterFullScreenBtn.onclick = startPiP;
+        enterFullScreenBtn.innerText = "Enter full screen";
+        enterFullScreenBtn.onclick = enterFullScreen;
+        enterFullScreenBtn.classList.add("hide");
 
         fullScreenMenuFooter.appendChild(enterFullScreenBtn);
 
@@ -137,18 +155,54 @@ window.onload = function () {
     }
 
 
-    function createFullScreenBtn() {
-        const fullScreenBtn = document.createElement("div");
-        fullScreenBtn.classList.add("fullScreenBtn");
+    function populateFullScreenMenu(fullScreenMenuBody) {
+        fullScreenMenuBody.innerHTML = ""; //clears content
 
-        const fullScreenIcon = document.createElement("img");
-        const imgSRC = chrome.runtime.getURL("./img/full_screen.png");
-        fullScreenIcon.src = imgSRC;
-        fullScreenIcon.alt = "Full Screen Icon";
+        const enterFullScreenBtn = document.getElementById("enterFullScreenBtn");
+        if(Object.entries(videosFound).length === 0) {
+            fullScreenMenuBody.innerText = "No videos detected.";
+            
+            enterFullScreenBtn.classList.add("hide");
+            return;
+        }
 
-        fullScreenBtn.appendChild(fullScreenIcon);
+        enterFullScreenBtn.classList.remove("hide");
 
-        return fullScreenBtn;
+        for(let videoName in videosFound) {
+            const listItem = document.createElement("div");
+            listItem.classList.add("listItem");
+            listItem.innerText = videoName
+
+            listItem.onclick = () => {
+                //adds or removes video
+                videoToFullScreen = videosFound[videoName];
+
+                deselectListItems();
+                listItem.classList.toggle("selected");
+            }
+
+            fullScreenMenuBody.appendChild(listItem);
+        }
+    }
+
+    function deselectListItems() {
+        const listItems = document.getElementsByClassName("listItem");
+        for(let listItem of listItems) {
+            listItem.classList.remove("selected");
+        }
+    }
+
+
+    function enterFullScreen() {
+        const fullScreenMenu = document.getElementById("fullScreenMenu");
+        fullScreenMenu.classList.add("hide");
+
+        if(videoToFullScreen === undefined) {
+            return;
+        }
+
+        videoToFullScreen.requestFullscreen();
+        videoToFullScreen = undefined;
     }
 
 
@@ -161,11 +215,9 @@ window.onload = function () {
 
         const pipBtn = createPiPBtn();
         pipBtn.onclick = () => {
-            if(pipMenu.classList.contains("hide")) {
-                const pipMenuBody = pipMenu.getElementsByClassName("pipMenuBody")[0];
-                getVideos();
-                populatePiPMenu(pipMenuBody);
-            }
+            const pipMenuBody = pipMenu.getElementsByClassName("pipMenuBody")[0];
+            refreshVideos();
+            populatePiPMenu(pipMenuBody);
 
             pipMenu.classList.toggle("hide");
         }
@@ -222,13 +274,14 @@ window.onload = function () {
     function populatePiPMenu(pipMenuBody) {
         pipMenuBody.innerHTML = ""; //clears content
 
+        const startPipBtn = document.getElementById("startPipBtn");
         if(Object.entries(videosFound).length === 0) {
             pipMenuBody.innerText = "No videos detected.";
+            
             startPipBtn.classList.add("hide");
-        return;
+            return;
         }
 
-        const startPipBtn = document.getElementById("startPipBtn");
         startPipBtn.classList.remove("hide");
         if(pipStarted) {
             startPipBtn.innerText = "Stop PiP";
