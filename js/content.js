@@ -1,4 +1,8 @@
 window.onload = function () {
+
+
+    ///////////////////////////////////////////// INITIALIZATIONS /////////////////////////////////////////////
+
     const btnsDivClassName = "Tmb7Fd";
     let btnsDiv = document.getElementsByClassName(btnsDivClassName)[0];
     
@@ -14,9 +18,6 @@ window.onload = function () {
     }
     pipvideo.onenterpictureinpicture = (event) => {
         pipStarted = true;
-
-        // const pipWindow = event.pictureInPictureWindow;
-        // console.log(`The floating window dimensions are: ${pipWindow.width}x${pipWindow.height}px`);
     }
 
     //global constants
@@ -24,6 +25,12 @@ window.onload = function () {
     const CANVAS_VIDEO_HEIGHT = 146;
     const CANVAS_VIDEO_WIDTH = 260;
 
+    ///////////////////////////////////////////// INITIALIZATIONS /////////////////////////////////////////////
+
+
+
+
+    ///////////////////////////////////////////// ADDS CUSTOM BUTTONS TO SCREEN /////////////////////////////////////////////
 
     if (btnsDiv === null || btnsDiv === undefined) {
 
@@ -61,6 +68,12 @@ window.onload = function () {
         addPipBtn();
     }
 
+    ///////////////////////////////////////////// ADDS CUSTOM BUTTONS TO SCREEN /////////////////////////////////////////////
+
+
+
+
+    ///////////////////////////////////////////// FETCHES ALL VIDEOS ON PAGE /////////////////////////////////////////////
 
     function refreshVideos() {
         videosFound = {}; //reset videosFound
@@ -88,6 +101,12 @@ window.onload = function () {
         }
     }
 
+    ///////////////////////////////////////////// FETCHES ALL VIDEOS ON PAGE /////////////////////////////////////////////
+
+
+
+
+    ///////////////////////////////////////////// FUNCTIONS RELATED TO THE FULL SCREEN FEATURE /////////////////////////////////////////////
 
     function addFullScreenBtn() {
         const container = document.createElement("div");
@@ -205,6 +224,12 @@ window.onload = function () {
         videoToFullScreen = undefined;
     }
 
+    ///////////////////////////////////////////// FUNCTIONS RELATED TO THE FULL SCREEN FEATURE /////////////////////////////////////////////
+
+
+
+
+    ///////////////////////////////////////////// FUNCTIONS RELATED TO THE PICTURE IN PICTURE FEATURE /////////////////////////////////////////////
 
     function addPipBtn() {
         const container = document.createElement("div");
@@ -353,4 +378,8 @@ window.onload = function () {
 
         pipStarted = false;
     }
+
+    ///////////////////////////////////////////// FUNCTIONS RELATED TO THE PICTURE IN PICTURE FEATURE /////////////////////////////////////////////
+
+    
 }
