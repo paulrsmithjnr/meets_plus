@@ -60,6 +60,33 @@ window.onload = function () {
     }
 
 
+    function getVideos() {
+        videosFound = {}; //reset videosFound
+        
+        const videos = document.getElementsByClassName("Gv1mTb-aTv5jf");
+        
+        //videos filter process
+        if(videos !== null && videos !== undefined) {
+            noNameCount = 1;
+            for(let video of videos) {
+                if(video.srcObject !== null && video.style.display !== "none") {
+                    videosDetected = true;
+
+                    const parentDiv = video.parentNode.parentNode.parentNode.parentNode;
+                    const textDiv = parentDiv.getElementsByClassName("XEazBc adnwBd")[0];
+
+                    if(textDiv !== undefined) {
+                        videosFound[textDiv.innerText] = video;
+                    } else {
+                        videosFound[`Presentation ${noNameCount}`] = video;
+                        noNameCount++;
+                    }
+                }
+            }
+        }
+    }
+
+
     function addFullScreenBtn() {
         const container = document.createElement("div");
         container.classList.add("container");
@@ -148,6 +175,21 @@ window.onload = function () {
     }
 
 
+    function createPiPBtn() {
+        const pipBtn = document.createElement("div");
+        pipBtn.classList.add("pipBtn");
+
+        const pipIcon = document.createElement("img");
+        const imgSRC = chrome.runtime.getURL("./img/meets_plus_icon.png");
+        pipIcon.src = imgSRC;
+        pipIcon.alt = "PiP Icon";
+
+        pipBtn.appendChild(pipIcon);
+
+        return pipBtn;
+    }
+
+
     function createPiPMenu() {
         const pipMenu = document.createElement("div");
         pipMenu.id = "pipMenu";
@@ -165,6 +207,7 @@ window.onload = function () {
         const startPipBtn = document.createElement("button");
         startPipBtn.id = "startPipBtn";
         startPipBtn.onclick = startPiP;
+        startPipBtn.classList.add("hide");
 
         pipMenuFooter.appendChild(startPipBtn);
 
@@ -181,10 +224,12 @@ window.onload = function () {
 
         if(Object.entries(videosFound).length === 0) {
             pipMenuBody.innerText = "No videos detected.";
-            return;
+            startPipBtn.classList.add("hide");
+        return;
         }
 
         const startPipBtn = document.getElementById("startPipBtn");
+        startPipBtn.classList.remove("hide");
         if(pipStarted) {
             startPipBtn.innerText = "Stop PiP";
             return;
@@ -212,48 +257,6 @@ window.onload = function () {
             }
 
             pipMenuBody.appendChild(listItem);
-        }
-    }
-
-
-    function createPiPBtn() {
-        const pipBtn = document.createElement("div");
-        pipBtn.classList.add("pipBtn");
-
-        const pipIcon = document.createElement("img");
-        const imgSRC = chrome.runtime.getURL("./img/meets_plus_icon.png");
-        pipIcon.src = imgSRC;
-        pipIcon.alt = "PiP Icon";
-
-        pipBtn.appendChild(pipIcon);
-
-        return pipBtn;
-    }
-
-
-    function getVideos() {
-        videosFound = {}; //reset videosFound
-        
-        const videos = document.getElementsByClassName("Gv1mTb-aTv5jf");
-        
-        //videos filter process
-        if(videos !== null && videos !== undefined) {
-            noNameCount = 1;
-            for(let video of videos) {
-                if(video.srcObject !== null && video.style.display !== "none") {
-                    videosDetected = true;
-
-                    const parentDiv = video.parentNode.parentNode.parentNode.parentNode;
-                    const textDiv = parentDiv.getElementsByClassName("XEazBc adnwBd")[0];
-
-                    if(textDiv !== undefined) {
-                        videosFound[textDiv.innerText] = video;
-                    } else {
-                        videosFound[`Presentation ${noNameCount}`] = video;
-                        noNameCount++;
-                    }
-                }
-            }
         }
     }
 
