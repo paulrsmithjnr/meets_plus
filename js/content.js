@@ -11,6 +11,7 @@ window.onload = function () {
     let pipStarted = false;
 
     let videoToFullScreen;
+    let autoStartPiPOnFullScreen = true;
 
     const pipvideo = document.createElement( "video" );
     pipvideo.onleavepictureinpicture = () => {
@@ -117,9 +118,9 @@ window.onload = function () {
 
         const fullScreenBtn = createFullScreenBtn();
         fullScreenBtn.onclick = () => {
-            const fullScreenMenuBody = fullScreenMenu.getElementsByClassName("fullScreenMenuBody")[0];
+            const fullScreenVideosDiv = fullScreenMenu.getElementsByClassName("videosDiv")[0];
             refreshVideos();
-            populateFullScreenMenu(fullScreenMenuBody);
+            populateFullScreenMenu(fullScreenVideosDiv);
 
             fullScreenMenu.classList.toggle("hide");
         }
@@ -155,6 +156,28 @@ window.onload = function () {
         fullScreenMenuBody = document.createElement("div");
         fullScreenMenuBody.classList.add("fullScreenMenuBody");
 
+        const checkboxDiv = document.createElement("div");
+        checkboxDiv.id = "checkboxDiv";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = autoStartPiPOnFullScreen;
+        checkbox.onchange = () => {
+            autoStartPiPOnFullScreen = checkbox.checked;
+        }
+
+        const label = document.createElement("span");
+        label.innerText = "Automatically start PiP";
+
+        const videosDiv = document.createElement("div");
+        videosDiv.classList.add("videosDiv");
+
+        checkboxDiv.appendChild(checkbox);
+        checkboxDiv.appendChild(label);
+        
+        fullScreenMenuBody.appendChild(checkboxDiv);
+        fullScreenMenuBody.appendChild(videosDiv);
+
         fullScreenMenuFooter = document.createElement("div");
         fullScreenMenuFooter.classList.add("fullScreenMenuFooter");
         
@@ -174,12 +197,12 @@ window.onload = function () {
     }
 
 
-    function populateFullScreenMenu(fullScreenMenuBody) {
-        fullScreenMenuBody.innerHTML = ""; //clears content
+    function populateFullScreenMenu(fullScreenVideosDiv) {
+        fullScreenVideosDiv.innerHTML = ""; //clears content
 
         const enterFullScreenBtn = document.getElementById("enterFullScreenBtn");
         if(Object.entries(videosFound).length === 0) {
-            fullScreenMenuBody.innerText = "No videos detected.";
+            fullScreenVideosDiv.innerText = "No videos detected.";
             
             enterFullScreenBtn.classList.add("hide");
             return;
@@ -200,7 +223,7 @@ window.onload = function () {
                 listItem.classList.toggle("selected");
             }
 
-            fullScreenMenuBody.appendChild(listItem);
+            fullScreenVideosDiv.appendChild(listItem);
         }
     }
 
