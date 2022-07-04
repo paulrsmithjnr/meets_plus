@@ -2,13 +2,13 @@ window.onload = function () {
     const btnsDivClassName = "Tmb7Fd";
     let btnsDiv = document.getElementsByClassName(btnsDivClassName)[0];
     
-    let videosFound = [];
+    let videosFound = {};
+    let videosToPiP = [];
     let pipStarted = false;
 
     const pipvideo = document.createElement( "video" );
     pipvideo.onleavepictureinpicture = () => {
-        pipStarted = false;
-        endPiP();
+        cleanupPiP();
     }
     pipvideo.onenterpictureinpicture = (event) => {
         pipStarted = true;
@@ -129,14 +129,15 @@ window.onload = function () {
         const container = document.createElement("div");
         container.classList.add("container");
 
-        const pipMenu = createPipMenu();
+        const pipMenu = createPiPMenu();
         container.appendChild(pipMenu);
 
         const pipBtn = createPiPBtn();
         pipBtn.onclick = () => {
             if(pipMenu.classList.contains("hide")) {
                 const pipMenuBody = pipMenu.getElementsByClassName("pipMenuBody")[0];
-                getVideos(pipMenuBody);
+                getVideos();
+                populatePiPMenu(pipMenuBody);
             }
 
             pipMenu.classList.toggle("hide");
@@ -147,7 +148,7 @@ window.onload = function () {
     }
 
 
-    function createPipMenu() {
+    function createPiPMenu() {
         const pipMenu = document.createElement("div");
         pipMenu.id = "pipMenu";
         pipMenu.classList.add("hide");
@@ -175,6 +176,46 @@ window.onload = function () {
     }
 
 
+    function populatePiPMenu(pipMenuBody) {
+        pipMenuBody.innerHTML = ""; //clears content
+
+        if(Object.entries(videosFound).length === 0) {
+            pipMenuBody.innerText = "No videos detected.";
+            return;
+        }
+
+        const startPipBtn = document.getElementById("startPipBtn");
+        if(pipStarted) {
+            startPipBtn.innerText = "Stop PiP";
+            return;
+        } else {
+            startPipBtn.innerText = "Start PiP";
+        }
+
+        for(let videoName in videosFound) {
+            const listItem = document.createElement("div");
+            listItem.classList.add("listItem");
+            listItem.innerText = videoName
+
+            listItem.onclick = () => {
+                //adds or removes video
+                const index = videosToPiP.indexOf(videosFound[videoName]);
+                if(index === -1) {
+                    if(videosToPiP.length < VIDEO_PIP_LIMIT) {
+                        videosToPiP.push(videosFound[videoName]);
+                        listItem.classList.toggle("selected");
+                    }
+                } else {
+                    videosToPiP.splice(index, 1);
+                    listItem.classList.toggle("selected");
+                }
+            }
+
+            pipMenuBody.appendChild(listItem);
+        }
+    }
+
+
     function createPiPBtn() {
         const pipBtn = document.createElement("div");
         pipBtn.classList.add("pipBtn");
@@ -190,19 +231,12 @@ window.onload = function () {
     }
 
 
-    function getVideos(pipMenuBody) {
-        pipMenuBody.innerHTML = ""; //clears content
-
-        const startPipBtn = document.getElementById("startPipBtn");
-        if(pipStarted) {
-            startPipBtn.innerText = "Stop PiP";
-            return;
-        } else {
-            startPipBtn.innerText = "Start PiP";
-        }
-
-        let videosDetected = false;
+    function getVideos() {
+        videosFound = {}; //reset videosFound
+        
         const videos = document.getElementsByClassName("Gv1mTb-aTv5jf");
+        
+        //videos filter process
         if(videos !== null && videos !== undefined) {
             noNameCount = 1;
             for(let video of videos) {
@@ -212,36 +246,13 @@ window.onload = function () {
                     const parentDiv = video.parentNode.parentNode.parentNode.parentNode;
                     const textDiv = parentDiv.getElementsByClassName("XEazBc adnwBd")[0];
 
-                    const listItem = document.createElement("div");
-                    listItem.classList.add("listItem");
-
                     if(textDiv !== undefined) {
-                        listItem.innerText = textDiv.innerText;
+                        videosFound[textDiv.innerText] = video;
                     } else {
-                        listItem.innerText = `Presentation ${noNameCount}`;
+                        videosFound[`Presentation ${noNameCount}`] = video;
                         noNameCount++;
                     }
-
-                    listItem.onclick = () => {
-                        //adds or removes video
-                        const index = videosFound.indexOf(video);
-                        if(index === -1) {
-                            if(videosFound.length < VIDEO_PIP_LIMIT) {
-                                videosFound.push(video);
-                                listItem.classList.toggle("selected");
-                            }
-                        } else {
-                            videosFound.splice(index, 1);
-                            listItem.classList.toggle("selected");
-                        }
-                    }
-
-                    pipMenuBody.appendChild(listItem); 
                 }
-            }
-
-            if(!videosDetected) {
-                pipMenuBody.innerText = "No videos detected.";
             }
         }
     }
@@ -251,16 +262,17 @@ window.onload = function () {
         const pipMenu = document.getElementById("pipMenu");
         pipMenu.classList.add("hide");
 
-        if(videosFound.length === 0) {
+        if(videosToPiP.length === 0) {
             return;
         }
 
         if(pipStarted) {
-            endPiP();
+            document.exitPictureInPicture();
+            cleanupPiP();
         } else {
             const canvas = document.createElement( "canvas" );
             
-            canvas.height = CANVAS_VIDEO_HEIGHT * videosFound.length;
+            canvas.height = CANVAS_VIDEO_HEIGHT * videosToPiP.length;
             canvas.width = CANVAS_VIDEO_WIDTH;
             const ctx = canvas.getContext( "2d" );
             
@@ -271,17 +283,18 @@ window.onload = function () {
             pipvideo.requestPictureInPicture();
 
             function addVideosToPiPCanvas() {
-                for(let i = 0; i < videosFound.length; i++) {
-                    ctx.drawImage(videosFound[i], 0, CANVAS_VIDEO_HEIGHT * i, CANVAS_VIDEO_WIDTH, CANVAS_VIDEO_HEIGHT);
+                for(let i = 0; i < videosToPiP.length; i++) {
+                    ctx.drawImage(videosToPiP[i], 0, CANVAS_VIDEO_HEIGHT * i, CANVAS_VIDEO_WIDTH, CANVAS_VIDEO_HEIGHT);
                 }
                 requestAnimationFrame(addVideosToPiPCanvas);
             }
         }
     }
 
-    function endPiP() {
-        document.exitPictureInPicture();
+    function cleanupPiP() {
         pipvideo.srcObject.getTracks().forEach(track => track.stop());
-        videosFound = [];
+        videosToPiP = [];
+
+        pipStarted = false;
     }
 }
