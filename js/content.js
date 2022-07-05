@@ -11,7 +11,6 @@ window.onload = function () {
     let pipStarted = false;
 
     let videoToFullScreen;
-    let autoStartPiPOnFullScreen = true;
 
     const pipvideo = document.createElement( "video" );
     pipvideo.onleavepictureinpicture = () => {
@@ -122,6 +121,9 @@ window.onload = function () {
             refreshVideos();
             populateFullScreenMenu(fullScreenVideosDiv);
 
+            const pipMenu = document.getElementById("pipMenu");
+            pipMenu.classList.add("hide");
+
             fullScreenMenu.classList.toggle("hide");
         }
         container.appendChild(fullScreenBtn);
@@ -156,26 +158,9 @@ window.onload = function () {
         fullScreenMenuBody = document.createElement("div");
         fullScreenMenuBody.classList.add("fullScreenMenuBody");
 
-        const checkboxDiv = document.createElement("div");
-        checkboxDiv.id = "checkboxDiv";
-
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.checked = autoStartPiPOnFullScreen;
-        checkbox.onchange = () => {
-            autoStartPiPOnFullScreen = checkbox.checked;
-        }
-
-        const label = document.createElement("span");
-        label.innerText = "Automatically start PiP";
-
         const videosDiv = document.createElement("div");
         videosDiv.classList.add("videosDiv");
 
-        checkboxDiv.appendChild(checkbox);
-        checkboxDiv.appendChild(label);
-        
-        fullScreenMenuBody.appendChild(checkboxDiv);
         fullScreenMenuBody.appendChild(videosDiv);
 
         fullScreenMenuFooter = document.createElement("div");
@@ -267,6 +252,9 @@ window.onload = function () {
             refreshVideos();
             populatePiPMenu(pipMenuBody);
 
+            const fullScreenMenu = document.getElementById("fullScreenMenu");
+            fullScreenMenu.classList.add("hide");
+
             pipMenu.classList.toggle("hide");
         }
         container.appendChild(pipBtn);
@@ -345,8 +333,7 @@ window.onload = function () {
 
             listItem.onclick = () => {
                 //adds or removes video
-                const index = videosToPiP.indexOf(videosFound[videoName]);
-                if(index === -1) {
+                if(!isInVideosToPiPArray(videosFound[videoName])) {
                     if(videosToPiP.length < VIDEO_PIP_LIMIT) {
                         videosToPiP.push(videosFound[videoName]);
                         listItem.classList.toggle("selected");
@@ -404,5 +391,16 @@ window.onload = function () {
 
     ///////////////////////////////////////////// FUNCTIONS RELATED TO THE PICTURE IN PICTURE FEATURE /////////////////////////////////////////////
 
+
+
+    ///////////////////////////////////////////// COMMON FUNCTIONS /////////////////////////////////////////////
+
+    function isInVideosToPiPArray(video) {
+        const index = videosToPiP.indexOf(video);
+        return index !== -1;
+    }
     
+    ///////////////////////////////////////////// COMMON FUNCTIONS /////////////////////////////////////////////
+
+
 }
