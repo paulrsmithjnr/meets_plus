@@ -11,6 +11,9 @@ window.onload = function () {
     let pipStarted = false;
 
     let videoToFullScreen;
+    let startPiPOnFullScreen = true;
+    let fullScreenClickCountdown = 2;
+    let isInFullScreen = false;    
 
     const pipvideo = document.createElement( "video" );
     pipvideo.onleavepictureinpicture = () => {
@@ -18,6 +21,14 @@ window.onload = function () {
     }
     pipvideo.onenterpictureinpicture = (event) => {
         pipStarted = true;
+    }
+
+    document.onfullscreenchange = () => {
+        if(isInFullScreen && pipStarted) {
+            document.exitPictureInPicture();
+        }
+
+        isInFullScreen = !isInFullScreen;
     }
 
     //global constants
@@ -158,9 +169,23 @@ window.onload = function () {
         fullScreenMenuBody = document.createElement("div");
         fullScreenMenuBody.classList.add("fullScreenMenuBody");
 
+        const checkboxDiv = document.createElement("div");
+        checkboxDiv.id = "checkboxDiv";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = startPiPOnFullScreen;
+
+        const label = document.createElement("span");
+        label.innerText = "Automatically start PiP";
+
         const videosDiv = document.createElement("div");
         videosDiv.classList.add("videosDiv");
 
+        checkboxDiv.appendChild(checkbox);
+        checkboxDiv.appendChild(label);
+
+        fullScreenMenuBody.appendChild(checkboxDiv);
         fullScreenMenuBody.appendChild(videosDiv);
 
         fullScreenMenuFooter = document.createElement("div");
@@ -168,7 +193,18 @@ window.onload = function () {
         
         const enterFullScreenBtn = document.createElement("button");
         enterFullScreenBtn.id = "enterFullScreenBtn";
-        enterFullScreenBtn.innerText = "Enter full screen";
+        enterFullScreenBtn.innerText = `Enter full screen (${fullScreenClickCountdown})`;
+
+        checkbox.onchange = () => {
+            startPiPOnFullScreen = checkbox.checked;
+            
+            if(startPiPOnFullScreen) {
+                enterFullScreenBtn.innerText = `Enter full screen (${fullScreenClickCountdown})`;
+            } else {
+                enterFullScreenBtn.innerText = "Enter full screen";
+            }
+        }
+        
         enterFullScreenBtn.onclick = enterFullScreen;
         enterFullScreenBtn.classList.add("hide");
 
@@ -221,15 +257,51 @@ window.onload = function () {
 
 
     function enterFullScreen() {
-        const fullScreenMenu = document.getElementById("fullScreenMenu");
-        fullScreenMenu.classList.add("hide");
-
         if(videoToFullScreen === undefined) {
             return;
         }
 
+        const enterFullScreenBtn = document.getElementById("enterFullScreenBtn");
+        if((startPiPOnFullScreen) && (videosToPiP !== []) && (!pipStarted)) {
+            if(fullScreenClickCountdown == 2) {
+                addRandomVideosToPip();
+                startPiP();
+                fullScreenClickCountdown--;
+            } else {
+                makeVideoFullScreen();
+                fullScreenClickCountdown = 2;
+            }
+            enterFullScreenBtn.innerText = `Enter full screen (${fullScreenClickCountdown})`;
+        } else {
+            makeVideoFullScreen();
+        }
+    }
+
+    function makeVideoFullScreen() {
+        const fullScreenMenu = document.getElementById("fullScreenMenu");
+        fullScreenMenu.classList.add("hide");
+
         videoToFullScreen.requestFullscreen();
         videoToFullScreen = undefined;
+    }
+
+
+    function addRandomVideosToPip() {
+        const videosKeys = Object.keys(videosFound); 
+        const length = videosKeys.length;
+        
+
+        let videoCount = 0;
+        while((videoCount < VIDEO_PIP_LIMIT) && (videoCount < length-1)) {
+            let randomIndex = Math.floor(Math.random() * length);
+            let randomVideoName = videosKeys[randomIndex]
+
+            let videoToAdd = videosFound[randomVideoName]
+            if((!isInVideosToPiPArray(videoToAdd)) && (videoToAdd !== videoToFullScreen)) {
+                videosToPiP.push(videoToAdd);
+                videoCount++;
+            }
+        }
     }
 
     ///////////////////////////////////////////// FUNCTIONS RELATED TO THE FULL SCREEN FEATURE /////////////////////////////////////////////
