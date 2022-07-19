@@ -28,6 +28,7 @@ window.onload = function () {
             document.exitPictureInPicture();
         }
 
+        fullScreenClickCountdown = 2;
         isInFullScreen = !isInFullScreen;
     }
 
@@ -102,7 +103,25 @@ window.onload = function () {
                     const textDiv = parentDiv.getElementsByClassName("XEazBc adnwBd")[0];
 
                     if(textDiv !== undefined) {
-                        videosFound[textDiv.innerText] = video;
+                        const keys = Object.keys(videosFound);
+                        let videoName = textDiv.innerText;
+
+                        let nameAlreadyExists = keys.indexOf(videoName) !== -1;
+                        if(nameAlreadyExists) {
+                            let nameCount = 2;
+                            let newVideoName = `${videoName} (${nameCount})`;
+
+                            let nameAlreadyExists = keys.indexOf(newVideoName) !== -1;
+                            while(nameAlreadyExists) {
+                                nameCount++;
+                                newVideoName = `${videoName} (${nameCount})`;
+
+                                nameAlreadyExists = keys.indexOf(newVideoName) !== -1;
+                            }
+                            videoName = newVideoName;
+                        }
+
+                        videosFound[videoName] = video;
                     } else {
                         videosFound[`Presentation ${noNameCount}`] = video;
                         noNameCount++;
@@ -135,6 +154,10 @@ window.onload = function () {
             const pipMenu = document.getElementById("pipMenu");
             pipMenu.classList.add("hide");
 
+            const enterFullScreenBtn = document.getElementById("enterFullScreenBtn");
+            if(startPiPOnFullScreen && (fullScreenClickCountdown == 2)) {
+                enterFullScreenBtn.innerText = `Enter full screen (2)`;
+            }
             fullScreenMenu.classList.toggle("hide");
         }
         container.appendChild(fullScreenBtn);
@@ -267,11 +290,10 @@ window.onload = function () {
                 addRandomVideosToPip();
                 startPiP();
                 fullScreenClickCountdown--;
+                enterFullScreenBtn.innerText = `Enter full screen (${fullScreenClickCountdown})`;
             } else {
                 makeVideoFullScreen();
-                fullScreenClickCountdown = 2;
             }
-            enterFullScreenBtn.innerText = `Enter full screen (${fullScreenClickCountdown})`;
         } else {
             makeVideoFullScreen();
         }
