@@ -446,6 +446,9 @@ window.onload = function () {
         countDiv.innerText = `Selected 0 participants (the limit is ${VIDEO_PIP_LIMIT})`;
         pipMenuBody.appendChild(countDiv);
 
+        const videosDiv = document.createElement("div");
+        videosDiv.classList.add("videosDiv");
+
         for(let videoName in videosFound) {
             const listItem = document.createElement("div");
             listItem.classList.add("listItem");
@@ -468,8 +471,9 @@ window.onload = function () {
                     `Selected ${videosToPiP.length} participants (the limit is ${VIDEO_PIP_LIMIT})`;
             }
 
-            pipMenuBody.appendChild(listItem);
+            videosDiv.appendChild(listItem);
         }
+        pipMenuBody.appendChild(videosDiv);
     }
 
 
