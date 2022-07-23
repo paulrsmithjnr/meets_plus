@@ -433,6 +433,7 @@ window.onload = function () {
                         listItem.classList.toggle("selected");
                     }
                 } else {
+                    const index = videosToPiP.indexOf(videosFound[videoName]);
                     videosToPiP.splice(index, 1);
                     listItem.classList.toggle("selected");
                 }
