@@ -4,8 +4,7 @@
     "description": "Additional functionalities to Google Meet.",
     "version": "1.0",
     "action": {
-        "default_title": "Meets+",
-        "default_popup": "./html/popup.html"
+        "default_title": "Meets+"
     },
     "content_scripts": [
         {
