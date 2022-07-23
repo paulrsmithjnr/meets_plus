@@ -1,3 +1,28 @@
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    src: url('chrome-extension://__MSG_@@extension_id__/fonts/Poppins-Regular.ttf'); 
+   }
+
+.popup-menu {
+    font-family: 'Poppins', sans-serif;
+    border-radius: 15px;
+}
+
+.popup-menu .title {
+    color: purple;
+    font-weight: bold;
+    font-size: medium;
+    margin: 5px 0;
+}
+
+.popup-menu .instructions {
+    color: gray;
+    font-size: 12px;
+}
+
+
 .container {
     margin-left: 6px;
     margin-right: 6px;
@@ -8,13 +33,25 @@
     display: none;
 }
 
+.pipMenuHeader, .fullScreenMenuHeader {
+    padding: 20px 20px 0;
+}
+
+.pipMenuBody, .fullScreenMenuBody {
+    padding: 0 20px;
+}
+
+.pipMenuFooter, .fullScreenMenuFooter {
+    padding: 0 20px 20px;
+}
+
 #pipMenu, #fullScreenMenu {
     position: absolute;
     left: 0;
     bottom: calc(100% + 20px);
 
-    padding: 20px;
-    width: 200px;
+    min-width: 200px;
+    width: fit-content;
     height: fit-content;
 
     z-index: 2;
@@ -39,19 +76,57 @@
 }
 
 .listItem {
-    height: 30px;
+    height: 33px;
+    font-size: 12px;
 
     cursor: pointer;
+    border-radius: 10px;
+    padding-left: 25px;
     
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: left;
 }
 
 .listItem:hover, .selected {
-    border-left: solid purple 2px;
-    background-color: rgba(228, 0, 228, 0.733);
-
     font-weight: bold;
-    font-style: italic;
+}
+
+.selected:hover {
+    color: white;
+    background-color: purple;
+
+}
+
+.selected {
+    color: rgb(167, 0, 167);
+}
+
+#checkboxDiv, #countDiv {
+    font-weight: bold;
+    font-size: smaller;
+
+    display: flex;
+    align-items: center;
+    justify-content: left;
+}
+
+.videosDiv {
+    margin: 5px 0;
+}
+
+#enterFullScreenBtn, #startPipBtn {
+    background: none;
+    border: purple solid 2px;
+    border-radius: 5px;
+    padding: 5px;
+
+    color: purple;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+}
+
+#enterFullScreenBtn:hover, #startPipBtn:hover {
+    background-color: purple;
+    color: white;
 }

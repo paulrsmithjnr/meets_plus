@@ -89,6 +89,10 @@ window.onload = function () {
 
     function refreshVideos() {
         videosFound = {}; //reset videosFound
+        videoToFullScreen = undefined;
+        if(!pipStarted) {
+            videosToPiP = [];
+        }
         
         const videos = document.getElementsByClassName("Gv1mTb-aTv5jf");
         
@@ -171,7 +175,7 @@ window.onload = function () {
         fullScreenBtn.classList.add("fullScreenBtn");
 
         const fullScreenIcon = document.createElement("img");
-        const imgSRC = chrome.runtime.getURL("./img/full_screen.png");
+        const imgSRC = chrome.runtime.getURL("img/full_screen.png");
         fullScreenIcon.src = imgSRC;
         fullScreenIcon.alt = "Full Screen Icon";
 
@@ -185,9 +189,13 @@ window.onload = function () {
         const fullScreenMenu = document.createElement("div");
         fullScreenMenu.id = "fullScreenMenu";
         fullScreenMenu.classList.add("hide");
+        fullScreenMenu.classList.add("popup-menu");
 
         fullScreenMenuHeader = document.createElement("div");
         fullScreenMenuHeader.classList.add("fullScreenMenuHeader");
+        fullScreenMenuHeader.innerHTML = '<h4 class="title">Meets+ (Full Screen)</h4>'
+                                        +'<span class="instructions">Select the participant to show in fullscreen.</span>'
+                                        +'<hr/>';
 
         fullScreenMenuBody = document.createElement("div");
         fullScreenMenuBody.classList.add("fullScreenMenuBody");
@@ -199,8 +207,8 @@ window.onload = function () {
         checkbox.type = "checkbox";
         checkbox.checked = startPiPOnFullScreen;
 
-        const label = document.createElement("span");
-        label.innerText = "Automatically start PiP";
+        const label = document.createElement("label");
+        label.innerHTML = "Automatically start PiP <small>(click the button below twice)</small>";
 
         const videosDiv = document.createElement("div");
         videosDiv.classList.add("videosDiv");
@@ -362,7 +370,7 @@ window.onload = function () {
         pipBtn.classList.add("pipBtn");
 
         const pipIcon = document.createElement("img");
-        const imgSRC = chrome.runtime.getURL("./img/meets_plus_icon.png");
+        const imgSRC = chrome.runtime.getURL("img/meets_plus_icon.png");
         pipIcon.src = imgSRC;
         pipIcon.alt = "PiP Icon";
 
@@ -376,9 +384,13 @@ window.onload = function () {
         const pipMenu = document.createElement("div");
         pipMenu.id = "pipMenu";
         pipMenu.classList.add("hide");
+        pipMenu.classList.add("popup-menu");
 
         pipMenuHeader = document.createElement("div");
         pipMenuHeader.classList.add("pipMenuHeader");
+        pipMenuHeader.innerHTML = '<h4 class="title">Meets+ (Picture-in-Picture)</h4>'
+                                        +'<span class="instructions">Select the participant(s) to open in PiP window.</span>'
+                                        +'<hr/>';
 
         pipMenuBody = document.createElement("div");
         pipMenuBody.classList.add("pipMenuBody");
@@ -420,6 +432,11 @@ window.onload = function () {
             startPipBtn.innerText = "Start PiP";
         }
 
+        const countDiv = document.createElement("div");
+        countDiv.id = "countDiv";
+        countDiv.innerText = `Selected 0 participants (the limit is ${VIDEO_PIP_LIMIT})`;
+        pipMenuBody.appendChild(countDiv);
+
         for(let videoName in videosFound) {
             const listItem = document.createElement("div");
             listItem.classList.add("listItem");
@@ -437,6 +454,9 @@ window.onload = function () {
                     videosToPiP.splice(index, 1);
                     listItem.classList.toggle("selected");
                 }
+                countDiv.innerText = videosToPiP.length === 1 ? 
+                    `Selected 1 participant (the limit is ${VIDEO_PIP_LIMIT})` :
+                    `Selected ${videosToPiP.length} participants (the limit is ${VIDEO_PIP_LIMIT})`;
             }
 
             pipMenuBody.appendChild(listItem);

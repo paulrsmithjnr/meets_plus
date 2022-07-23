@@ -18,7 +18,8 @@
         {
         "resources": [
             "img/meets_plus_icon.png",
-            "img/full_screen.png"
+            "img/full_screen.png",
+            "fonts/Poppins-Regular.ttf"
         ],
         "matches": [ "https://meet.google.com/*" ]
        }
