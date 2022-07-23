@@ -158,9 +158,12 @@ window.onload = function () {
             const pipMenu = document.getElementById("pipMenu");
             pipMenu.classList.add("hide");
 
+            const numberOfVideosFound = Object.entries(videosFound).length;
             const enterFullScreenBtn = document.getElementById("enterFullScreenBtn");
-            if(startPiPOnFullScreen && (fullScreenClickCountdown == 2)) {
+            if(startPiPOnFullScreen && (fullScreenClickCountdown == 2) && (numberOfVideosFound > 1)) {
                 enterFullScreenBtn.innerText = `Enter full screen (2)`;
+            } else {
+                enterFullScreenBtn.innerText = `Enter full screen`;
             }
             fullScreenMenu.classList.toggle("hide");
         }
@@ -224,12 +227,17 @@ window.onload = function () {
         
         const enterFullScreenBtn = document.createElement("button");
         enterFullScreenBtn.id = "enterFullScreenBtn";
-        enterFullScreenBtn.innerText = `Enter full screen (${fullScreenClickCountdown})`;
+
+        const numberOfVideosFound = Object.entries(videosFound).length;
+        enterFullScreenBtn.innerText = numberOfVideosFound > 1 ?
+            `Enter full screen (2)`:
+            `Enter full screen`;
 
         checkbox.onchange = () => {
             startPiPOnFullScreen = checkbox.checked;
             
-            if(startPiPOnFullScreen) {
+            const currentNumberOfVideosFound = Object.entries(videosFound).length;
+            if(startPiPOnFullScreen && (currentNumberOfVideosFound > 1)) {
                 enterFullScreenBtn.innerText = `Enter full screen (${fullScreenClickCountdown})`;
             } else {
                 enterFullScreenBtn.innerText = "Enter full screen";
@@ -293,8 +301,9 @@ window.onload = function () {
         }
 
         const enterFullScreenBtn = document.getElementById("enterFullScreenBtn");
-        if((startPiPOnFullScreen) && (videosToPiP !== []) && (!pipStarted)) {
-            if(fullScreenClickCountdown == 2) {
+        const numberOfVideosFound = Object.entries(videosFound).length;
+        if((startPiPOnFullScreen) && (numberOfVideosFound !== 0) && (!pipStarted)) {
+            if((fullScreenClickCountdown == 2) && (numberOfVideosFound !==1)) {
                 addRandomVideosToPip();
                 startPiP();
                 fullScreenClickCountdown--;
@@ -464,7 +473,7 @@ window.onload = function () {
     }
 
 
-    async function startPiP() {
+    function startPiP() {
         const pipMenu = document.getElementById("pipMenu");
         pipMenu.classList.add("hide");
 
@@ -485,8 +494,14 @@ window.onload = function () {
             pipvideo.srcObject = canvas.captureStream();
 
             addVideosToPiPCanvas();
-            await pipvideo.play();
-            pipvideo.requestPictureInPicture();
+
+            var playPromise = pipvideo.play();
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    pipvideo.requestPictureInPicture();
+            
+                });
+            }
 
             function addVideosToPiPCanvas() {
                 for(let i = 0; i < videosToPiP.length; i++) {
