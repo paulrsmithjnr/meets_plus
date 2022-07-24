@@ -2,6 +2,12 @@
     "manifest_version": 3,
     "name": "Meets+",
     "description": "Additional functionalities to Google Meet.",
+    "icons": {
+        "16": "./img/icons/Meets_Plus_Icon_16x16.png",
+        "32": "./img/icons/Meets_Plus_Icon_32x32.png",
+        "64": "./img/icons/Meets_Plus_Icon_64x64.png",
+        "128": "./img/icons/Meets_Plus_Icon_128x128.png"
+    },
     "version": "1.0",
     "action": {
         "default_title": "Meets+"
